@@ -99,7 +99,11 @@ Otros libros:
 
 5) <https://blog.rstudio.com/2020/09/30/rstudio-v1-4-preview-visual-markdown-editing/>
 
+Trabajo con RDF:
 
+<https://cran.r-project.org/web/packages/SPARQL/SPARQL.pdf>
+
+<https://cran.r-project.org/web/packages/rdflib/rdflib.pdf>
 
 Generar gráficos animados
 <https://gganimate.com/index.html>
