@@ -1,0 +1,116 @@
+---
+title: "Usando SPARQL y RMD"
+author: "Francisco Cifuentes Silva"
+date: "12/4/2020"
+output: html_document
+#output: pdf_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rmarkdown::pandoc_convert("UsingSPARQL_and_latex.Rmd", to = "latex", output = "salida.tex")
+
+library(SPARQL)
+library(dplyr)
+
+```
+
+## Primer informe con R-Markdown
+
+Este documento lo hemos generado con R-Markdown <http://rmarkdown.rstudio.com>.
+
+Ahora vamos a procesar la consultas que hicimos en el archivo R. Comenzamos por inicializar lo básico a ambas consultas:
+
+```{r comenzar}
+
+# ---- Inicializar datos básicos
+endpoint<-"http://datos.bcn.cl/sparql"
+prefix <- c('bcnbio','<http://datos.bcn.cl/ontologies/bcn-biographies#>',
+            "bio","http://purl.org/vocab/bio/0.1/",
+            "foaf","http://xmlns.com/foaf/0.1/",
+            "time","http://www.w3.org/2006/time#")
+```
+
+### Consulta 1
+
+Ahora ejecutamos la consulta 1. Para ver las opciones de los code chunk revisar este enlace <https://rmarkdown.rstudio.com/lesson-3.html>.
+
+```{r consulta1, cache=TRUE }
+# ---- Primera consulta
+consulta1 <- "SELECT count(*) as ?total WHERE {
+     ?s a foaf:Person 
+     }"
+
+res1 <- SPARQL(url=endpoint,
+            query=consulta1,
+            ns=prefix)
+res1 
+```
+### Consulta 2
+
+Ahora ejecutaremos la segunda consulta y vamos a graficar los datos:
+
+```{r consulta2, cache=TRUE}
+consulta2 <- "SELECT ?s ?nombre ?anio WHERE {
+     ?s a foaf:Person;
+     foaf:name ?nombre;
+     bcnbio:hasBorn ?nacimiento .
+     ?nacimiento bio:date ?fecha .
+     ?fecha time:year ?anio .
+     }"
+
+res2 <- SPARQL(url=endpoint,
+            query=consulta2,
+            ns=prefix)
+
+res2$results %>% summary
+```
+### Graficar con ggplot2
+
+Ahora vamos a graficar estos datos en un histograma agregando la función de densidad de probabilidad ^[https://es.wikipedia.org/wiki/Funci%C3%B3n_de_densidad_de_probabilidad]:
+
+
+```{r graficar, message=FALSE}
+library(ggplot2)
+
+res2$results %>% 
+ ggplot(aes(x=anio)) + 
+ geom_histogram(aes(y=..density..), colour="black", fill="white")+
+ geom_density(alpha=.2, fill="#FF6666") +
+ geom_vline(aes(xintercept=mean(anio)), color="blue", linetype="dashed", size=1)
+
+
+```
+
+
+## Recursos
+Libro español de R <https://es.r4ds.hadley.nz/>
+
+Otros libros:
+
+1) <https://bookdown.org/yihui/rmarkdown/>
+
+2) <https://bookdown.org/yihui/rmarkdown-cookbook/>
+
+3) <https://bookdown.org/>
+
+4) <https://bookdown.org/yihui/rmarkdown-cookbook/word-template.html>
+
+5) <https://blog.rstudio.com/2020/09/30/rstudio-v1-4-preview-visual-markdown-editing/>
+
+
+
+Generar gráficos animados
+<https://gganimate.com/index.html>
+
+Haven (paquete para leer archivos de stata)
+<https://haven.tidyverse.org>
+
+Libro ggplot2
+<https://ggplot2-book.org/>
+
+## Atajos
+
+En `Tools > Global Options > Spelling` es posible elegir el idioma del corrector de texto
+
